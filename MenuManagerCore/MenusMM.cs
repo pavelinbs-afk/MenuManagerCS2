@@ -389,6 +389,8 @@ internal static class MenusMM
         MM_MenuCallbackFunc callback = (string szBack, string szFront, int iItem, int iSlot) =>
         {
             var player = Utilities.GetPlayerFromSlot(iSlot);
+            if (player == null) return;
+
             if (iItem < 7)
             {
                 var index = int.Parse(szBack);
@@ -396,10 +398,9 @@ internal static class MenusMM
                     ClosePlayerMenu(iSlot);
                 menu.MenuOptions[index].OnSelect(player, menu.MenuOptions[index]);
 
-                
                 switch (menu.PostSelectAction)
                 {
-                    case PostSelectAction.Close: ClosePlayerMenu(iSlot); Control.CloseMenu(Utilities.GetPlayerFromSlot(iSlot)); break;                    
+                    case PostSelectAction.Close: ClosePlayerMenu(iSlot); Control.CloseMenu(player); break;
                     case PostSelectAction.Reset: if (menu.ResetAction != null && !Control.HasOpenedMenu(player)) Server.NextFrameAsync(() => menu.ResetAction(player)); break;
                 }
 

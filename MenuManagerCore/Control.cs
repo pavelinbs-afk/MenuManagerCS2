@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Menu;
@@ -14,7 +14,7 @@ namespace MenuManager;
 internal static class Control
 {
     public static List<PlayerInfo> menus = new List<PlayerInfo>();
-    private static MenuManagerCore hPlugin;
+    private static MenuManagerCore hPlugin = null!;
 
     public static void AddMenu(CCSPlayerController player, ButtonMenu inst)
     {
@@ -42,7 +42,7 @@ internal static class Control
         var players = Utilities.GetPlayers();
         foreach (var player in players)
         {
-            if(player != null && player.IsValid && !player.IsBot && !player.IsHLTV && player.Connected == PlayerConnectedState.PlayerConnected)
+            if(player != null && player.IsValid && !player.IsBot && !player.IsHLTV && player.Connected == PlayerConnectedState.Connected)
                 AddMenu(player, inst);
         }
     }
@@ -76,7 +76,7 @@ internal static class Control
                 PlayerButtons buttons = 0;
 
                 buttons = player.Buttons;
-                if(!hPlugin.Config.MoveWhileOpenMenu)
+                if(!hPlugin.Config.MoveWhileOpenMenu && player.PlayerPawn.Value != null)
                     player.PlayerPawn.Value.VelocityModifier = 0.0f;
                 
                 if (!menu.IsEqualButtons(buttons.ToString()))
@@ -98,7 +98,7 @@ internal static class Control
                     if (buttons.HasFlag(hPlugin.Config.ButtonsConfig.ExitButton) || menu.Closed())
                     {                            
                         menu.Close(true);
-                        if (!hPlugin.Config.MoveWhileOpenMenu)
+                        if (!hPlugin.Config.MoveWhileOpenMenu && player.PlayerPawn.Value != null)
                             player.PlayerPawn.Value.VelocityModifier = menu.GetMod();
                         menus.RemoveAt(i);
                         i--;
@@ -130,7 +130,7 @@ internal static class Control
         MenusMM.ClosePlayerMenu(player.Slot);
     }
  
-    internal static bool HasOpenedMenu(CCSPlayerController player, PlayerInfo info = null)
+    internal static bool HasOpenedMenu(CCSPlayerController player, PlayerInfo? info = null)
     {     
         
         foreach (var menu in menus)

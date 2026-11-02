@@ -11,12 +11,12 @@ namespace MenuManager
 {
     public class MenuInstance : IMenu
     {
-        public Action<CCSPlayerController> BackAction;
-        public Action<CCSPlayerController> ResetAction;
+        public Action<CCSPlayerController>? BackAction;
+        public Action<CCSPlayerController>? ResetAction;
 
         MenuType forcetype;
 
-        public MenuInstance(string _title, Action<CCSPlayerController> _back_action = null, Action<CCSPlayerController> _reset_action = null, MenuType _forcetype = MenuType.Default)
+        public MenuInstance(string _title, Action<CCSPlayerController>? _back_action = null, Action<CCSPlayerController>? _reset_action = null, MenuType _forcetype = MenuType.Default)
         {
             Title = _title;
             ExitButton = true;
@@ -60,22 +60,20 @@ namespace MenuManager
 
         public void Open(CCSPlayerController player)
         {
-            IMenu menu = null;
-
             if (forcetype == MenuType.Default)
                 forcetype = Misc.GetCurrentPlayerMenu(player);
 
             if (forcetype == MenuType.MetamodMenu && !MenusMM.Hooked())
                 forcetype = MenuType.ButtonMenu;
 
-            switch (forcetype)
+            IMenu menu = forcetype switch
             {
-                case MenuType.ChatMenu: menu = new ChatMenu(Title); break;
-                case MenuType.ConsoleMenu: menu = new ConsoleMenu(Title);  break;
-                case MenuType.CenterMenu: menu = new CenterHtmlMenu(Title, Control.GetPlugin()); break;
-                case MenuType.ButtonMenu: menu = new ButtonMenu(Title, false);  break;
-                case MenuType.MetamodMenu: menu = new ButtonMenu(Title, true);  break;
-            }
+                MenuType.ChatMenu => new ChatMenu(Title),
+                MenuType.ConsoleMenu => new ConsoleMenu(Title),
+                MenuType.CenterMenu => new CenterHtmlMenu(Title, Control.GetPlugin()),
+                MenuType.MetamodMenu => new ButtonMenu(Title, true),
+                _ => new ButtonMenu(Title, false),
+            };
 
             menu.ExitButton = ExitButton;
             menu.PostSelectAction = PostSelectAction;

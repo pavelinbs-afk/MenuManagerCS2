@@ -25,13 +25,12 @@ public class MenuManagerTest : BasePlugin
     [ConsoleCommand("mm_test", "Test menu!")]
     public void OnCommand(CCSPlayerController? player, CommandInfo command)
     {
-        if (player != null)
-        {            
+        if (player != null && _api != null)
+        {
             var menu = _api.GetMenu("Ticklingig");
             for (int i = 0; i < 10; i++)
                 menu.AddMenuOption($"itemline{i}", (player, option) => { player.PrintToChat($"Selected: {option.Text}"); });
             menu.Open(player);
-            
         }
         
 
